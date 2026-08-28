@@ -1,0 +1,31 @@
+{
+	"version": 1,
+	"dryRun": false,
+	"maxNotifications": 200,
+	"notificationLookbackHours": 30,
+	"maxActivityPages": 20,
+	"notificationCommentSkewSeconds": 120,
+	"concurrency": 5,
+	"rules": [
+		{
+			"name": "GitHub Actions comments on my threads",
+			"commentAuthors": ["github-actions[bot]"],
+			"threadAuthors": ["@me"],
+			"subjectTypes": ["PullRequest", "Issue"],
+			"action": "done"
+		},
+		{
+			"name": "My pull request state changes",
+			"stateChangeAuthors": ["@me"],
+			"threadAuthors": ["@me"],
+			"subjectTypes": ["PullRequest"],
+			"action": "done"
+		},
+		{
+			"name": "Keep one release notification per repository each week",
+			"subjectTypes": ["Release"],
+			"releaseRetention": "latest-per-repository-per-week",
+			"action": "done"
+		}
+	]
+}

@@ -1,0 +1,58 @@
+name: Notification janitor
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: How matching notifications should be handled
+        required: true
+        type: choice
+        default: dry-run
+        options:
+          - dry-run
+          - apply
+
+permissions:
+  contents: read
+
+concurrency:
+  group: notification-janitor
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    name: Triage notifications
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the configuration
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Test the notification janitor
+        run: >-
+          node --experimental-transform-types --test
+          .github/scripts/notification-janitor.test.ts
+
+      - name: Triage notifications
+        env:
+          NOTIFICATIONS_TOKEN: ${{ secrets.NOTIFICATIONS_TOKEN }}
+          DISPATCH_MODE: ${{ inputs.mode }}
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            node --experimental-transform-types \
+              .github/scripts/notification-janitor.ts \
+              "--${DISPATCH_MODE}"
+          else
+            node --experimental-transform-types \
+              .github/scripts/notification-janitor.ts
+          fi
