@@ -1,5 +1,7 @@
 # GitHub notification janitor
 
+Tired of github filling up your notifications about bot comments on your own PRs. Just fork this repo and it's gone.
+
 A GitHub Actions workflow that marks selected notifications Done. It keeps the
 thread subscribed.
 
